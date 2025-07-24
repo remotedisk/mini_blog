@@ -5,6 +5,14 @@
 
 #show math.equation: to-mathml
 
+
+#metadata("Cross-entropy loss and its optimization") <meta:title>
+#metadata("dive into cross-entropy loss and its optimization") <meta:desc>
+#metadata("2024-12-12") <meta:date>
+#metadata("Xiaotian Han") <meta:author>
+#metadata("coding") <meta:tags>
+
+
 #set heading(numbering: "1.")
 #outline(title: "Table of Contents", depth: 1)
 

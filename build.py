@@ -33,13 +33,29 @@ def check_dependencies():
     print(f"✅ Python: {sys.version.split()[0]}")
 
 def extract_metadata(file_path, key):
-    """Extract metadata from .typ file"""
+    """Extract metadata from .typ file using typst query"""
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            for line in f:
-                if line.startswith(f"// {key}:"):
-                    return line.replace(f"// {key}:", "").strip()
-        return ""
+        # Get the directory of the .typ file and change to it
+        typ_dir = file_path.parent
+        typ_filename = file_path.name
+        
+        result = subprocess.run([
+            'typst', 'query', 
+            typ_filename, 
+            f"<meta:{key}>",
+            '--field', 'value',
+            '--one'
+        ], capture_output=True, text=True, cwd=str(typ_dir))
+        
+        if result.returncode == 0:
+            return result.stdout.strip().strip('"')  # Remove any surrounding quotes
+        else:
+            # Fallback to comment-based extraction if query fails
+            with open(file_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    if line.startswith(f"// {key}:"):
+                        return line.replace(f"// {key}:", "").strip()
+            return ""
     except Exception as e:
         print(f"   ⚠️  Warning: Could not read metadata from {file_path}: {e}")
         return ""

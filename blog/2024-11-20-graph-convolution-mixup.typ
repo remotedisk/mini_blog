@@ -5,6 +5,13 @@
 
 #show math.equation: to-mathml
 
+#metadata("Graph Convolution ≈ Mixup") <meta:title>
+#metadata("Revealing the connection between graph convolution and mixup") <meta:desc>
+#metadata("2024-11-20") <meta:date>
+#metadata("Xiaotian Han") <meta:author>
+#metadata("graph") <meta:tags>
+
+
 #set heading(numbering: "1.")
 #outline(title: "Table of Contents", depth: 1)
 

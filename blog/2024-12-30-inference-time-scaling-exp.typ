@@ -2,17 +2,13 @@
 #import "./3rd_party/mathyml/lib.typ" as mathyml
 #import "./3rd_party/mathyml/lib.typ": *
 #import mathyml.prelude:*
-
-// #show: main.with(
-//   title: "Reproduce the inference time scaling exp",
-//   desc: "dive into the minimal experiment to show the inference time scaling.",
-//   date: "2024-12-30",
-//   tags: (
-//     "paper", "reproducibility", "llm", "scaling"
-//   ),
-// )
-
 #show math.equation: to-mathml
+
+#metadata("Reproduce the inference time scaling exp") <meta:title>
+#metadata("dive into the minimal experiment to show the inference time scaling.") <meta:desc>
+#metadata("2024-12-30") <meta:date>
+#metadata("Xiaotian Han") <meta:author>
+#metadata("paper") <meta:tags>
 
 #set heading(numbering: "1.")
 #outline(title: "Table of Contents", depth: 1)

@@ -4,6 +4,14 @@
 #import mathyml.prelude:*
 
 #show math.equation: to-mathml
+
+#metadata("Attention and its gradient") <meta:title>
+#metadata("dive into attention and its gradient") <meta:desc>
+#metadata("2024-10-20") <meta:date>
+#metadata("Xiaotian Han") <meta:author>
+#metadata("coding") <meta:tags>
+
+
 #set heading(numbering: "1.")
 #outline(title: "Table of Contents", depth: 1)
 

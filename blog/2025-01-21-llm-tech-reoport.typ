@@ -3,16 +3,16 @@
 #import "./3rd_party/mathyml/lib.typ": *
 #import mathyml.prelude:*
 
-// #show: main.with(
-//   title: "LLM Tech Report",
-//   desc: "LLM Tech Report",
-//   date: "2025-06-08",
-//   tags: (
-//     "rl",
-//     "llms",
-//   ),
-// )
 #show math.equation: to-mathml
+
+
+#metadata("LLM Tech Report") <meta:title>
+#metadata("LLM Tech Report") <meta:desc>
+#metadata("2025-01-21") <meta:date>
+#metadata("Xiaotian Han") <meta:author>
+#metadata("rl") <meta:tags>
+
+
 #set heading(numbering: "1.")
 #outline(title: "Table of Contents", depth: 1)
 

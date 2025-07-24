@@ -3,18 +3,13 @@
 #import "./3rd_party/mathyml/lib.typ": *
 #import mathyml.prelude:*
 
-// #show: main.with(
-//   title: "RoPE: Rotational Position Embedding",
-//   desc: "A simple and effective positional embedding for transformer models",
-//   date: "2025-03-18",
-//   tags: (
-//     "transformer",
-//     "positional-embedding",
-//     "paper",
-//   ),
-// )
-// 
 #show math.equation: to-mathml
+
+#metadata("RoPE: Rotational Position Embedding") <meta:title>
+#metadata("A simple and effective positional embedding for transformer models") <meta:desc>
+#metadata("2025-03-18") <meta:date>
+#metadata("Xiaotian Han") <meta:author>
+#metadata("transformer") <meta:tags>
 
 
 #set heading(numbering: "1.")

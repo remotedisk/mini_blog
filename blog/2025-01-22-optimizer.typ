@@ -3,16 +3,13 @@
 #import "./3rd_party/mathyml/lib.typ": *
 #import mathyml.prelude:*
 
-// #show: main.with(
-//   title: "Optimizers: math, implementations and efficiency",
-//   desc: "From math to optimized code: implementing optimizers with PyTorch comparisons",
-//   date: "2025-01-22",
-//   author: "Xiaotian Han",
-//   tags: (
-//     "coding",
-//   ),
-// )
 #show math.equation: to-mathml
+
+#metadata("Optimizers: math, implementations and efficiency") <meta:title>
+#metadata("From math to optimized code: implementing optimizers with PyTorch comparisons") <meta:desc>
+#metadata("2025-01-22") <meta:date>
+#metadata("Xiaotian Han") <meta:author>
+#metadata("coding") <meta:tags>
 
 #set heading(numbering: "1.")
 #outline(title: "Table of Contents", depth: 1)
