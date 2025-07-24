@@ -23,6 +23,12 @@ The GitHub workflow automatically:
    - Under "Source", select "Deploy from a branch"
    - Choose "gh-pages" as the branch
    - Click "Save"
+   
+   **Important**: Also ensure GitHub Actions has proper permissions:
+   - Go to Settings → Actions → General
+   - Under "Workflow permissions", select "Read and write permissions"
+   - Check "Allow GitHub Actions to create and approve pull requests"
+   - Click "Save"
 
 2. **Push your changes:**
    ```bash
@@ -139,6 +145,13 @@ The generated HTML includes basic styling. You can customize:
 **Workflow fails on first run:**
 - Check that GitHub Pages is enabled in repository settings
 - Ensure the repository is public (or GitHub Pages is available for private repos)
+- Verify GitHub Actions has "Read and write permissions" in repository settings
+
+**Permission denied errors:**
+- Go to Settings → Actions → General → Workflow permissions
+- Select "Read and write permissions" 
+- Enable "Allow GitHub Actions to create and approve pull requests"
+- Re-run the failed workflow
 
 **Images not displaying:**
 - Make sure image files (like `glacier.jpg`) are committed to the repository
@@ -158,6 +171,12 @@ The generated HTML includes basic styling. You can customize:
   - For branches: Ensure the branch name is correct
 - **Build fails**: Try using a stable release tag instead of `main` branch or commit hashes
 - **Cache issues**: If builds are inconsistent, the cache key includes the git reference to avoid conflicts
+
+**Deployment issues:**
+- If GitHub Pages deployment fails, try the alternative method:
+  1. Uncomment the alternative deployment steps in the workflow file
+  2. Comment out the current `peaceiris/actions-gh-pages@v3` step
+  3. This uses the official GitHub Pages actions which may have better compatibility
 
 ### Logs and Debugging
 - Check the "Actions" tab in your GitHub repository
