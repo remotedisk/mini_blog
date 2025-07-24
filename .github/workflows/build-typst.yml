@@ -155,17 +155,15 @@ jobs:
         name: typst-html-output
         path: dist/
         
-    # - name: Setup Pages
-    #   if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    #   uses: actions/configure-pages@v4
-    #   with:
-    #     enablement: true
+    - name: Setup Pages
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: actions/configure-pages@v4
       
-    # - name: Upload to GitHub Pages
-    #   if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    #   uses: actions/upload-pages-artifact@v3
-    #   with:
-    #     path: dist
+    - name: Upload to GitHub Pages
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: dist
         
     - name: Deploy to GitHub Pages
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
