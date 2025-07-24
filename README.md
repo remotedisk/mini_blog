@@ -23,7 +23,7 @@ The GitHub workflow automatically:
    - Under "Source", select "GitHub Actions"
    - Click "Save"
    
-   **Note**: The workflow now uses the official GitHub Pages deployment method, which works better with default permissions.
+   **Important**: The workflow now uses the official GitHub Pages deployment method, which resolves permission issues.
 
 2. **Push your changes:**
    ```bash
@@ -144,8 +144,8 @@ The generated HTML includes basic styling. You can customize:
 
 **Deployment issues:**
 - Make sure "GitHub Actions" is selected as the Pages source (not "Deploy from a branch")
-- The workflow now uses the official GitHub Actions deployment method
-- If you see permission errors, ensure Pages is enabled in repository settings
+- The workflow uses the official GitHub Actions deployment method (no permission issues)
+- Check that Pages is enabled in repository settings
 
 **Images not displaying:**
 - Make sure image files (like `glacier.jpg`) are committed to the repository
@@ -166,11 +166,10 @@ The generated HTML includes basic styling. You can customize:
 - **Build fails**: Try using a stable release tag instead of `main` branch or commit hashes
 - **Cache issues**: If builds are inconsistent, the cache key includes the git reference to avoid conflicts
 
-**Deployment issues:**
-- If GitHub Pages deployment fails, try the alternative method:
-  1. Uncomment the alternative deployment steps in the workflow file
-  2. Comment out the current `peaceiris/actions-gh-pages@v3` step
-  3. This uses the official GitHub Pages actions which may have better compatibility
+**Environment setup:**
+- The workflow automatically creates a `github-pages` environment
+- Deployment URL will be available in the workflow output
+- Uses official GitHub Pages actions for reliable deployment
 
 ### Logs and Debugging
 - Check the "Actions" tab in your GitHub repository
