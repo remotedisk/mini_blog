@@ -1130,6 +1130,11 @@ section[aria-label="News"] p {
   margin: 0.1em;
   /* font-size: 0.9em; */
 }
+
+/* Blog Section Styles - match news styling */
+section h2 + ul li {
+  margin: 0.1em;
+}
   
   /* Article specific styles */
   article {

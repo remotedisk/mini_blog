@@ -220,17 +220,31 @@ def generate_blog_index(posts_data, site_config, environment):
     """Generate the blog index page"""
     print("📋 Generating blog index...")
     
-    # Generate blog posts HTML
+    # Sort posts by date (newest first)
+    def parse_date(date_str):
+        """Parse date string to allow sorting"""
+        try:
+            # Try to parse different date formats
+            from datetime import datetime
+            for fmt in ['%Y-%m-%d', '%Y.%m', '%Y-%m', '%m/%d/%Y', '%m-%d-%Y']:
+                try:
+                    return datetime.strptime(date_str, fmt)
+                except ValueError:
+                    continue
+            # If no format works, return a default old date
+            return datetime(1900, 1, 1)
+        except:
+            return datetime(1900, 1, 1)
+    
+    sorted_posts = sorted(posts_data, key=lambda x: parse_date(x['date']), reverse=True)
+    
+    # Generate blog posts HTML in news style
     posts_html = ""
-    for post in posts_data:
+    for post in sorted_posts:
+        # Format date like news items
+        date_formatted = f"<strong>{post['date']}</strong>"
         posts_html += f'''
-                <li>
-                    <div class="heading">
-                        <h4><a href="{post['filename']}.html">{post['title']}</a></h4>
-                        <span class="date">{post['date']}</span>
-                    </div>
-                    <p class="description">{post['excerpt']} <a href="{post['filename']}.html">Read more →</a></p>
-                </li>'''
+                <li>{date_formatted}: <a href="{post['filename']}.html">{post['title']}</a></li>'''
     
     # Generate blog index page
     template_vars = {
