@@ -398,7 +398,7 @@ def main():
     
     # Site configuration
     site_config = {
-        'title': "Mini Blog",
+        'title': "Xiaotian Han",
         'description': "A beautiful blog powered by Typst",
         'about': "This blog showcases the power of Typst for creating beautiful documents and web content. Write in Typst, deploy to the web!"
     }
