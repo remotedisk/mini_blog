@@ -679,7 +679,7 @@ main {
   }
   
   .outline {
-    margin-top: -2em;
+    /* margin-top: -1em; */
     text-align: left;
   }
   
@@ -1121,11 +1121,15 @@ main {
     }
   }
   
-  /* News Section Styles */
-  section[aria-label="News"] p {
-    margin: 0.1em;
-    /* font-size: 0.9em; */
+  article math {
+    color: blue;
   }
+
+/* News Section Styles */
+section[aria-label="News"] p {
+  margin: 0.1em;
+  /* font-size: 0.9em; */
+}
   
   /* Article specific styles */
   article {

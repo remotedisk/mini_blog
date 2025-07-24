@@ -4,9 +4,19 @@
 // author: Blog Author
 // excerpt: Recent developments in typesetting software have rekindled hope in previously frustrated researchers. This post explores Typst's capabilities and demonstrates various features.
 
+#import "./3rd_party/mathyml/lib.typ": *
+
+
+#metadata("Introduction to Typst") <meta:title>
+#metadata("Recent developments in typesetting software have rekindled hope in previously frustrated researchers. This post explores Typst's capabilities and demonstrates various features.") <meta:desc>
+#metadata("2024-07-23") <meta:date>
+#metadata("Xiaotian Han") <meta:author>
+#metadata("typst") <meta:tags>
+
+
 #set heading(numbering: "1.")
 
-#outline(title: none)
+#outline(title: "Table of Contents", depth: 1)
 
 = Introduction <sec:intro>
 Recent developments in
@@ -22,8 +32,8 @@ comparison with others.
 
 == Performance <sec:results:perf>
 demonstrates what slow
-software looks like.
-$ O(n) = 2^n $
+software looks like #to-mathml($O(n) = 2^n$).
+#to-mathml($ O(n) = 2^n $)
 
 
 == Image <sec:results:image>

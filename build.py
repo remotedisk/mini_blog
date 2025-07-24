@@ -50,13 +50,21 @@ def compile_typst_post(typ_file, output_file):
         env = os.environ.copy()
         env['TYPST_FEATURES'] = 'html'
         
+        # Get the directory of the .typ file and change to it
+        typ_dir = typ_file.parent
+        original_cwd = Path.cwd()
+        
+        # Make paths relative to the typ file directory
+        typ_filename = typ_file.name
+        output_path = output_file.resolve()
+        
         result = subprocess.run([
             'typst', 'compile', 
-            str(typ_file), 
-            str(output_file),
+            typ_filename, 
+            str(output_path),
             '--format', 'html',
             '--features', 'html'
-        ], env=env, capture_output=True, text=True)
+        ], env=env, capture_output=True, text=True, cwd=str(typ_dir))
         
         if result.returncode != 0:
             print(f"   ❌ Typst compilation failed:")
