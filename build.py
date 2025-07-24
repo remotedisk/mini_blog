@@ -224,12 +224,37 @@ def generate_main_index(site_config, environment):
     )
 
 def copy_static_assets():
-    """Copy static assets to dist folder"""
-    print("📦 Copying static assets...")
+    """Copy static assets and CSS to dist folder"""
+    print("📦 Copying static assets and styles...")
     
-    static_dir = Path("static")
     dist_dir = Path("dist")
     
+    # Copy CSS file
+    try:
+        css_source = Path("src/style.css")
+        css_dest = dist_dir / "style.css"
+        if css_source.exists():
+            shutil.copy2(css_source, css_dest)
+            print("   ✅ Copied style.css")
+        else:
+            print("   ⚠️  Warning: style.css not found in src/")
+    except Exception as e:
+        print(f"   ❌ Failed to copy CSS: {e}")
+        return False
+    
+    # Copy blog-specific CSS for blog pages
+    try:
+        css_source = Path("src/style.css")
+        blog_css_dest = dist_dir / "blog" / "style.css"
+        if css_source.exists():
+            shutil.copy2(css_source, blog_css_dest)
+            print("   ✅ Copied style.css to blog folder")
+    except Exception as e:
+        print(f"   ❌ Failed to copy CSS to blog folder: {e}")
+        return False
+    
+    # Copy static assets
+    static_dir = Path("static")
     if not static_dir.exists():
         print("   No static directory found")
         return True
@@ -244,6 +269,7 @@ def copy_static_assets():
                 shutil.copy2(item, dist_dir / item.name)
             elif item.is_dir():
                 shutil.copytree(item, dist_dir / item.name, dirs_exist_ok=True)
+        print("   ✅ Copied static assets")
         return True
     except Exception as e:
         print(f"   ❌ Failed to copy static assets: {e}")
@@ -327,7 +353,9 @@ def main():
     print("📂 Output directory: ./dist/")
     print("📄 Files created:")
     print("   - dist/index.html (main page)")
+    print("   - dist/style.css (stylesheet)")
     print("   - dist/blog/index.html (blog index)")
+    print("   - dist/blog/style.css (stylesheet for blog pages)")
     
     # List generated blog posts
     for post in posts_data:

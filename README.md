@@ -1,6 +1,6 @@
 # Mini Blog - Typst to HTML
 
-A beautiful blog system powered by Typst that automatically compiles your documents to HTML and deploys them with GitHub Actions.
+A clean, academic-style blog system powered by Typst that automatically compiles your documents to HTML and deploys them with GitHub Actions. Features a minimal design inspired by academic homepages.
 
 ## 🚀 Local Development
 
@@ -87,11 +87,14 @@ mini_blog/
 ├── src/
 │   ├── main-index.html     # Main page template
 │   ├── blog-index.html     # Blog index template
-│   └── blog-post.html      # Individual blog post template
+│   ├── blog-post.html      # Individual blog post template
+│   └── style.css           # Shared stylesheet
 ├── dist/                   # Build output (auto-generated)
 │   ├── index.html          # Main page
+│   ├── style.css           # Main stylesheet
 │   ├── blog/
 │   │   ├── index.html      # Blog index
+│   │   ├── style.css       # Stylesheet (copy for blog pages)
 │   │   ├── test.html       # Compiled blog posts
 │   │   └── getting-started.html
 │   └── glacier.jpg         # Copied static assets
@@ -195,7 +198,9 @@ Place images in the `static/` folder, then reference them:
 )
 ```
 
-## 🎨 Customizing Templates
+## 🎨 Customizing Templates and Styles
+
+### Templates
 
 The blog uses three main templates in the `src/` folder:
 
@@ -230,6 +235,53 @@ site_config = {
     'description': "Your blog description", 
     'about': "About your blog..."
 }
+```
+
+### Styles
+
+The blog uses a clean, **academic-style design** inspired by professional academic homepages. The single shared stylesheet at `src/style.css` contains all the CSS for the entire site:
+
+**Design Philosophy:**
+- **Minimal & Clean**: White background, plenty of whitespace, subtle borders
+- **Typography-focused**: Emphasis on readability and content hierarchy  
+- **Academic Aesthetic**: Professional look suitable for research, writing, and academic content
+- **No cards or shadows**: Flat design with simple borders and dividers
+
+**Key sections:**
+- **Base Styles**: Clean typography, generous line spacing, academic color palette
+- **Layout Components**: Simple header, minimal navigation, content-focused layout
+- **Blog Components**: Clean post listings without cards or heavy styling
+- **Blog Post Page**: Academic paper-like styling with clear hierarchy
+- **Typst Content**: Professional styling for academic content (headings, tables, code, math)
+
+**Customizing styles:**
+1. Edit `src/style.css` to modify the design
+2. The build script automatically copies it to `dist/style.css` and `dist/blog/style.css`
+3. All templates reference the external CSS file (no inline styles)
+
+**Academic color palette:**
+```css
+/* Current academic color scheme */
+body { background: #ffffff; color: #333; }
+h1, h2, h3 { color: #000; }
+.text-muted { color: #888; }
+a { color: #007acc; }
+borders: #e5e5e5
+```
+
+**Common customizations:**
+```css
+/* Adjust typography */
+body {
+    font-family: 'Georgia', 'Times New Roman', serif; /* More academic feel */
+    font-size: 17px; /* Larger for better readability */
+}
+
+/* Customize link colors */
+a { color: #2c5aa0; } /* Academic blue */
+
+/* Modify content width */
+body { max-width: 1000px; } /* Wider for more content */
 ```
 
 ## 🌐 Production Deployment
@@ -302,6 +354,12 @@ python3 build.py production # Production build for deployment
 - Ensure template variables use the correct `{{VARIABLE}}` format
 - Check for typos in variable names
 
+**Styling issues:**
+- Ensure `src/style.css` exists and is valid CSS
+- Check that CSS files are being copied to `dist/` and `dist/blog/`
+- Verify CSS links in templates point to the correct relative paths
+- Clear browser cache if styles aren't updating
+
 **Local server issues:**
 - Try different ports: `python3 -m http.server 3000 -d dist`
 - Or use Node.js: `npx serve dist -p 3000`
@@ -320,14 +378,15 @@ python3 build.py production # Production build for deployment
 
 ## 🎯 Blog Features
 
-- **📝 Easy writing**: Write in Typst markup language
-- **🎨 Beautiful typography**: Professional-quality output
-- **📊 Math support**: LaTeX-quality mathematical expressions
-- **💻 Code highlighting**: Syntax highlighting for code blocks
-- **📱 Responsive design**: Looks great on all devices
-- **🚀 Fast deployment**: Automatic GitHub Actions deployment
-- **🔍 SEO friendly**: Proper HTML structure and meta tags
-- **📑 Blog index**: Automatic generation of post listing
+- **📝 Academic writing**: Write in Typst markup language with LaTeX-quality output
+- **🎨 Clean typography**: Professional, academic-style design focused on readability
+- **📊 Math support**: Beautiful mathematical expressions with proper formatting
+- **💻 Code highlighting**: Clean syntax highlighting for technical content
+- **📱 Responsive design**: Mobile-friendly academic layout
+- **🚀 Fast deployment**: Automatic GitHub Actions deployment to GitHub Pages
+- **🔍 SEO friendly**: Proper HTML structure and semantic markup
+- **📑 Blog index**: Clean, academic-style post listing
 - **🏷️ Metadata support**: Title, date, author, excerpt for each post
+- **🎓 Academic aesthetic**: Inspired by professional academic homepages like [Xiaotian Han's site](https://ahxt.github.io/)
 
-Enjoy blogging with Typst! 🎉 
+Perfect for researchers, academics, and anyone who appreciates clean, professional design! 🎓 
