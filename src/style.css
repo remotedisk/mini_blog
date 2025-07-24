@@ -44,18 +44,22 @@
     font-size: 0.9rem;
     letter-spacing: 300;
     text-shadow: 0 0 0.5px rgba(57, 57, 57, 0.25);
+    /* Prevent layout shift from scrollbar appearance */
+    overflow-y: scroll;
   }
   
   
   main,
-  .search {
-    max-width: min(50rem, calc(100% - 2em));
-    margin: auto;
-    overflow-x: hidden;
-  }
-  main {
-    padding: 3em 1em;
-  }
+.search {
+  max-width: min(50rem, calc(100% - 2em));
+  margin: auto;
+  overflow-x: hidden;
+}
+main {
+  padding: 3em 1em;
+  /* Ensure consistent width calculation */
+  box-sizing: border-box;
+}
   @media (max-width: 720px) {
     main {
       padding: 1em;
