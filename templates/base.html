@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ site_title }}{% endblock %}</title>
+    <link rel="stylesheet" href="{% block css_path %}style.css{% endblock %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo-container">
+                <a href="{% block home_link %}/{% endblock %}" class="logo-link">
+                    <h1 class="logo-text">{{ site_title }}</h1>
+                </a>
+            </div>
+            <div class="internal-links">
+                <a href="{% block about_link %}#about{% endblock %}" class="nav-link {% if nav_active == 'about' %}active{% endif %}">
+                    <span class="nav-text">About</span>
+                </a>
+                <a href="{% block blog_link %}blog/{% endblock %}" class="nav-link {% if nav_active == 'blog' %}active{% endif %}">
+                    <span class="nav-text">Blog</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+    
+    <main>
+        {% block breadcrumbs %}{% endblock %}
+        
+        {% block content %}{% endblock %}
+        
+        {% block footer %}
+        <!-- <footer>
+            <div class="footer-content">
+                <p style="color: var(--gray-color); font-size: 0.9em; text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--raw-bg-color);">
+                    Built with Typst
+                </p>
+            </div>
+        </footer> -->
+        {% endblock %}
+    </main>
+</body>
+</html> 

@@ -65,10 +65,16 @@ jobs:
         git: https://github.com/typst/typst.git
         commit: f4be243396add8582910a746f3c1ba5fc63713ef
 # f4be243396add8582910a746f3c1ba5fc63713ef   7278d887cf05fadc9a96478830e5876739b78f53
+    - name: Install Python dependencies
+      run: |
+        # Install required Python packages for Jinja2 templating
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r requirements.txt
+        
     - name: Build Typst project
       run: |
-        # Run Python build script for production
-        python3 build.py production
+        # Run Python build script
+        python3 build.py
         
     - name: Prepare deployment directory
       run: |

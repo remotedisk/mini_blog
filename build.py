@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 """
-Typst Blog Build Script
-Usage: python3 build.py [local|production]
+Typst Blog Build Script with Jinja2 Templates
+Usage: python3 build.py
 """
 
 import os
@@ -11,6 +11,7 @@ import re
 import subprocess
 import shutil
 from pathlib import Path
+from jinja2 import Environment, FileSystemLoader
 
 def check_dependencies():
     """Check if required tools are installed"""
@@ -127,16 +128,20 @@ def extract_html_body_from_string(html_content):
         print(f"   ❌ Could not extract HTML body from string: {e}")
         return ""
 
-def process_template(template_file, output_file, variables):
-    """Process a template file with variable substitution"""
+def setup_jinja2_env():
+    """Set up Jinja2 environment"""
+    return Environment(
+        loader=FileSystemLoader('templates'),
+        autoescape=True,
+        trim_blocks=True,
+        lstrip_blocks=True
+    )
+
+def render_template(env, template_name, output_file, variables):
+    """Render a Jinja2 template with variables"""
     try:
-        with open(template_file, 'r', encoding='utf-8') as f:
-            template = f.read()
-        
-        # Replace all variables
-        result = template
-        for key, value in variables.items():
-            result = result.replace(f"{{{{{key}}}}}", str(value))
+        template = env.get_template(template_name)
+        result = template.render(**variables)
         
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(result)
@@ -144,10 +149,10 @@ def process_template(template_file, output_file, variables):
         return True
         
     except Exception as e:
-        print(f"   ❌ Template processing failed: {e}")
+        print(f"   ❌ Template rendering failed: {e}")
         return False
 
-def generate_blog_post(typ_file, site_config, environment):
+def generate_blog_post(typ_file, site_config):
     """Generate a single blog post"""
     filename = typ_file.stem
     print(f"📝 Processing blog post: {typ_file}")
@@ -190,16 +195,16 @@ def generate_blog_post(typ_file, site_config, environment):
     
     # Generate final HTML from template
     print("   📄 Generating HTML...")
+    env = setup_jinja2_env()
     template_vars = {
-        'SITE_TITLE': site_config['title'],
-        'POST_TITLE': title,
-        'POST_DATE': date,
-        'POST_AUTHOR': author,
-        'POST_CONTENT': body_content,
-        'ENVIRONMENT': environment
+        'site_title': site_config['title'],
+        'post_title': title,
+        'post_date': date,
+        'post_author': author,
+        'post_content': body_content
     }
     
-    if not process_template(Path("src/blog-post.html"), final_file, template_vars):
+    if not render_template(env, "blog-post.html", final_file, template_vars):
         return None
     
     # Clean up temp file
@@ -217,7 +222,7 @@ def generate_blog_post(typ_file, site_config, environment):
         'excerpt': excerpt
     }
 
-def generate_blog_index(posts_data, site_config, environment):
+def generate_blog_index(posts_data, site_config):
     """Generate the blog index page"""
     print("📋 Generating blog index...")
     
@@ -239,23 +244,16 @@ def generate_blog_index(posts_data, site_config, environment):
     
     sorted_posts = sorted(posts_data, key=lambda x: parse_date(x['date']), reverse=True)
     
-    # Generate blog posts HTML in news style
-    posts_html = ""
-    for post in sorted_posts:
-        # Format date like news items
-        date_formatted = f"<strong>{post['date']}</strong>"
-        posts_html += f'''
-                <li>{date_formatted}: <a href="{post['filename']}.html">{post['title']}</a></li>'''
-    
     # Generate blog index page
+    env = setup_jinja2_env()
     template_vars = {
-        'SITE_TITLE': site_config['title'],
-        'BLOG_POSTS': posts_html,
-        'ENVIRONMENT': environment
+        'site_title': site_config['title'],
+        'blog_posts': sorted_posts  # Pass the posts as a list for Jinja2 to iterate
     }
     
-    return process_template(
-        Path("src/blog-index.html"), 
+    return render_template(
+        env,
+        "blog-index.html", 
         Path("dist/blog/index.html"), 
         template_vars
     )
@@ -293,7 +291,7 @@ def compile_typst_section(typ_file):
         print(f"   ❌ Error compiling {typ_file}: {e}")
         return ""
 
-def generate_main_index(site_config, environment):
+def generate_main_index(site_config):
     """Generate the main index page"""
     print("📄 Generating main index page...")
     
@@ -302,18 +300,19 @@ def generate_main_index(site_config, environment):
     news_content = compile_typst_section(Path("src/news.typ"))
     cv_content = compile_typst_section(Path("src/cv.typ"))
     
+    env = setup_jinja2_env()
     template_vars = {
-        'SITE_TITLE': site_config['title'],
-        'SITE_DESCRIPTION': site_config['description'],
-        'ABOUT_TEXT': site_config['about'],
-        'ABOUT_CONTENT': about_content,
-        'NEWS_CONTENT': news_content,
-        'CV_CONTENT': cv_content,
-        'ENVIRONMENT': environment
+        'site_title': site_config['title'],
+        'site_description': site_config['description'],
+        'about_text': site_config['about'],
+        'about_content': about_content,
+        'news_content': news_content,
+        'cv_content': cv_content
     }
     
-    return process_template(
-        Path("src/main-index.html"), 
+    return render_template(
+        env,
+        "main-index.html", 
         Path("dist/index.html"), 
         template_vars
     )
@@ -384,13 +383,7 @@ def copy_static_assets():
 
 def main():
     """Main build function"""
-    # Parse command line arguments
-    environment = sys.argv[1] if len(sys.argv) > 1 else "local"
-    if environment not in ["local", "production"]:
-        print("❌ Invalid environment. Use 'local' or 'production'")
-        sys.exit(1)
-    
-    print(f"🔨 Building Typst blog for {environment} environment...")
+    print("🔨 Building Typst blog...")
     print("=" * 50)
     
     # Check dependencies
@@ -426,7 +419,7 @@ def main():
     posts_data = []
     for typ_file in typ_files:
         print(f"🔄 Starting processing: {typ_file}")
-        post_data = generate_blog_post(typ_file, site_config, environment)
+        post_data = generate_blog_post(typ_file, site_config)
         if post_data:
             posts_data.append(post_data)
             print(f"   ✅ Successfully processed: {typ_file}")
@@ -442,12 +435,12 @@ def main():
     print()
     
     # Generate blog index
-    if not generate_blog_index(posts_data, site_config, environment):
+    if not generate_blog_index(posts_data, site_config):
         print("❌ Failed to generate blog index")
         sys.exit(1)
     
     # Generate main index
-    if not generate_main_index(site_config, environment):
+    if not generate_main_index(site_config):
         print("❌ Failed to generate main index")
         sys.exit(1)
     

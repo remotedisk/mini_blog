@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Blog - {{ site_title }}{% endblock %}
+
+{% block css_path %}../style.css{% endblock %}
+{% block home_link %}../{% endblock %}
+{% block about_link %}../#about{% endblock %}
+{% block blog_link %}./{% endblock %}
+
+{% set nav_active = 'blog' %}
+
+{% block breadcrumbs %}
+<div style="margin-bottom: 2rem;">
+    <a href="../" class="nav-link">
+        <span class="nav-text">← Home</span>
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<section>
+    <h1>Blog</h1>
+    <p>Thoughts, tutorials, and musings</p>
+</section>
+
+<section>
+    <h2>All Posts</h2>
+    <ul>
+        {% for post in blog_posts %}
+        <li><strong>{{ post.date }}</strong>: <a href="{{ post.filename }}.html">{{ post.title }}</a></li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %} 

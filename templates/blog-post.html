@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post_title }} - {{ site_title }}{% endblock %}
+
+{% block css_path %}../style.css{% endblock %}
+{% block home_link %}../{% endblock %}
+{% block about_link %}../#about{% endblock %}
+{% block blog_link %}../blog/{% endblock %}
+
+{% block breadcrumbs %}
+<div style="margin-bottom: 2rem; display: flex; gap: 1rem;">
+    <a href="../" class="nav-link">
+        <span class="nav-text">← Home</span>
+    </a>
+    <a href="../blog/" class="nav-link">
+        <span class="nav-text">← Blog</span>
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<article class="blog-post">
+    <div class="title">
+        <h1>{{ post_title }}</h1>
+        <div class="annotation">
+            <span class="date">{{ post_date }}</span> • 
+            <span class="post-author">{{ post_author }}</span>
+        </div>
+    </div>
+    
+    <div class="content">
+        {{ post_content | safe }}
+    </div>
+</article>
+{% endblock %} 
