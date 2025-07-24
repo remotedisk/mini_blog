@@ -1,6 +1,6 @@
 // #import "/content/blog.typ": *
-#import "./3rd_party/mathyml/lib.typ" as mathyml
-#import "./3rd_party/mathyml/lib.typ": *
+#import "../3rd_party/mathyml/lib.typ" as mathyml
+#import "../3rd_party/mathyml/lib.typ": *
 #import mathyml.prelude:*
 
 #show math.equation: to-mathml
@@ -11,6 +11,8 @@
 #metadata("2024-10-19") <meta:date>
 #metadata("Xiaotian Han") <meta:author>
 #metadata("coding") <meta:tags>
+#metadata("softmax") <meta:tags>
+#metadata("True") <meta:published>
 
 
 #set heading(numbering: "1.")

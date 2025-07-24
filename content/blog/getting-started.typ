@@ -1,14 +1,17 @@
-// Blog Post Metadata
-// title: Getting Started with This Blog
-// date: 2024-07-20
-// author: Blog Author
-// excerpt: Learn how to set up and use this Typst-powered blog system. This guide covers everything from writing your first post to deploying it with GitHub Actions.
-
 #metadata("Getting Started with This Blog") <meta:title>
 #metadata("Learn how to set up and use this Typst-powered blog system. This guide covers everything from writing your first post to deploying it with GitHub Actions.") <meta:desc>
 #metadata("2024-07-20") <meta:date>
 #metadata("Xiaotian Han") <meta:author>
 #metadata("typst") <meta:tags>
+
+// #import "../3rd_party/mathyml/lib.typ": *
+// #import "../3rd_party/mathyml/lib.typ" as mathyml
+// #import mathyml.prelude:*
+
+// #show math.equation: to-mathml
+
+
+
 
 
 #set heading(numbering: "1.")

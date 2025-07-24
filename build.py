@@ -6,465 +6,192 @@ Usage: python3 build.py
 """
 
 import os
-import sys
 import re
 import subprocess
 import shutil
 from pathlib import Path
+from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 
-def check_dependencies():
-    """Check if required tools are installed"""
-    print("🔍 Checking dependencies...")
-    
-    # Check Typst
+def check_typst():
+    """Check if Typst is installed"""
     try:
-        result = subprocess.run(['typst', '--version'], capture_output=True, text=True)
-        if result.returncode == 0:
-            print(f"✅ Typst: {result.stdout.strip()}")
-        else:
-            raise FileNotFoundError
-    except FileNotFoundError:
-        print("❌ Typst is not installed. Please install it first:")
-        print("   📦 From releases: https://github.com/typst/typst/releases")
-        print("   🦀 From source: cargo install --git https://github.com/typst/typst.git --rev 7278d887cf05fadc9a96478830e5876739b78f53 typst-cli")
-        sys.exit(1)
-    
-    # Check Python (already running, but verify version)
-    print(f"✅ Python: {sys.version.split()[0]}")
+        typst_version = subprocess.run(['typst', '--version'], capture_output=True, check=True)
+        print("✅ Typst found", typst_version.stdout.decode('utf-8').strip())
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        print("❌ Typst not found. Install from: https://github.com/typst/typst/releases")
+        exit(1)
 
-def extract_metadata(file_path, key):
-    """Extract metadata from .typ file using typst query"""
+def query_typst(typ_file, selector):
+    """Query Typst file for specific content using typst query"""
     try:
-        # Get the directory of the .typ file and change to it
-        typ_dir = file_path.parent
-        typ_filename = file_path.name
-        
         result = subprocess.run([
-            'typst', 'query', 
-            typ_filename, 
-            f"<meta:{key}>",
-            '--field', 'value',
-            '--one'
-        ], capture_output=True, text=True, cwd=str(typ_dir))
-        
+            'typst', 'query', "--root", "..", str(typ_file), selector, '--field', 'value', '--one'
+        ], capture_output=True, text=True)
         if result.returncode == 0:
-            return result.stdout.strip().strip('"')  # Remove any surrounding quotes
-        else:
-            # Fallback to comment-based extraction if query fails
-            with open(file_path, 'r', encoding='utf-8') as f:
-                for line in f:
-                    if line.startswith(f"// {key}:"):
-                        return line.replace(f"// {key}:", "").strip()
-            return ""
-    except Exception as e:
-        print(f"   ⚠️  Warning: Could not read metadata from {file_path}: {e}")
-        return ""
+            return result.stdout.strip().strip('"')
+    except:
+        pass
+    return ""
 
-def compile_typst_post(typ_file, output_file):
-    """Compile a single Typst file to HTML"""
-    try:
-        env = os.environ.copy()
-        env['TYPST_FEATURES'] = 'html'
-        
-        # Get the directory of the .typ file and change to it
-        typ_dir = typ_file.parent
-        original_cwd = Path.cwd()
-        
-        # Make paths relative to the typ file directory
-        typ_filename = typ_file.name
-        output_path = output_file.resolve()
-        
-        result = subprocess.run([
-            'typst', 'compile',
-            typ_filename, 
-            str(output_path),
-            '--format', 'html',
-            '--features', 'html',
-            '--root', '..'
-        ], env=env, capture_output=True, text=True, cwd=str(typ_dir))
-        
-        if result.returncode != 0:
-            print(f"   ❌ Typst compilation failed:")
-            print(f"   {result.stderr}")
-            return False
-            
-        if not output_file.exists():
-            print(f"   ❌ Output file not created: {output_file}")
-            return False
-            
-        return True
-        
-    except Exception as e:
-        print(f"   ❌ Compilation error: {e}")
-        return False
-
-def extract_html_body(html_file):
-    """Extract body content from HTML file"""
-    try:
-        with open(html_file, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
-        # Extract body content
-        body_match = re.search(r'<body[^>]*>(.*?)</body>', content, re.DOTALL)
-        if body_match:
-            return body_match.group(1).strip()
-        return content
-        
-    except Exception as e:
-        print(f"   ❌ Could not extract HTML body: {e}")
-        return ""
-
-def extract_html_body_from_string(html_content):
-    """Extract body content from HTML string"""
-    try:
-        # Extract body content
-        body_match = re.search(r'<body[^>]*>(.*?)</body>', html_content, re.DOTALL)
-        if body_match:
-            return body_match.group(1).strip()
-        return html_content.strip()
-        
-    except Exception as e:
-        print(f"   ❌ Could not extract HTML body from string: {e}")
-        return ""
-
-def setup_jinja2_env():
-    """Set up Jinja2 environment"""
-    return Environment(
-        loader=FileSystemLoader('templates'),
-        autoescape=True,
-        trim_blocks=True,
-        lstrip_blocks=True
-    )
-
-def render_template(env, template_name, output_file, variables):
-    """Render a Jinja2 template with variables"""
-    try:
-        template = env.get_template(template_name)
-        result = template.render(**variables)
-        
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(result)
-            
-        return True
-        
-    except Exception as e:
-        print(f"   ❌ Template rendering failed: {e}")
-        return False
-
-def generate_blog_post(typ_file, site_config):
-    """Generate a single blog post"""
-    filename = typ_file.stem
-    print(f"📝 Processing blog post: {typ_file}")
+def extract_metadata(typ_file, key):
+    """Extract metadata from .typ file"""
+    # Try typst query first
+    metadata = query_typst(typ_file, f"<meta:{key}>")
+    if metadata:
+        return metadata
     
-    # Check if file exists and is readable
-    if not typ_file.exists():
-        print(f"   ❌ File not found: {typ_file}")
-        return None
-        
-    if not os.access(typ_file, os.R_OK):
-        print(f"   ❌ File not readable: {typ_file}")
-        return None
+    # Fallback to comment parsing
+    try:
+        with open(typ_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.startswith(f"// {key}:"):
+                    return line.replace(f"// {key}:", "").strip()
+    except:
+        pass
+    return ""
+
+def compile_typst(typ_file, output_file=None):
+    """Compile Typst file to HTML"""
+    print(f"Compiling {typ_file} to {output_file}")
+    cmd = ['typst', 'compile', str(typ_file), '--format', 'html', '--features', 'html', '--root', '..']
+    if output_file:
+        cmd.append(str(output_file))
+    else:
+        cmd.append('-')  # stdout
     
-    # Extract metadata
-    title = extract_metadata(typ_file, "title") or "Untitled Post"
-    date = extract_metadata(typ_file, "date") or "Unknown Date"
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"❌ Failed to compile {typ_file}: {result.stderr}")
+        return ""
+    
+    if output_file:
+        return True
+    
+    # Extract body content from stdout
+    body_match = re.search(r'<body[^>]*>(.*?)</body>', result.stdout, re.DOTALL)
+    return body_match.group(1).strip() if body_match else result.stdout.strip()
+
+def process_blog_post(typ_file):
+    """Process a single blog post"""
+    print(f"📝 Processing: {typ_file.name}")
+    
+    # Extract metadata using typst query
+    title = extract_metadata(typ_file, "title") or "Untitled"
+    desc = extract_metadata(typ_file, "desc") or ""
+    date = extract_metadata(typ_file, "date") or "Unknown"
     author = extract_metadata(typ_file, "author") or "Anonymous"
-    excerpt = extract_metadata(typ_file, "excerpt") or "No excerpt available."
+    published = extract_metadata(typ_file, "published") or "True"
+    tags = query_typst(typ_file, "<meta:tags>").split(', ') if query_typst(typ_file, "<meta:tags>") else []
     
-    print(f"   Title: {title}")
-    print(f"   Date: {date}")
-    print(f"   Author: {author}")
-    print(f"   Excerpt: {excerpt[:50]}...")
-    
-    # Create temp and final output paths
-    dist_blog = Path("dist/blog")
-    temp_file = dist_blog / f"{filename}.temp.html"
-    final_file = dist_blog / f"{filename}.html"
-    
-    # Compile Typst to HTML
-    print("   🔨 Compiling Typst...")
-    if not compile_typst_post(typ_file, temp_file):
+    # Skip unpublished posts
+    if published.lower() == "false":
+        print(f"   ⏭️  Skipping unpublished post")
         return None
     
-    # Extract body content
-    body_content = extract_html_body(temp_file)
-    if not body_content:
-        print("   ❌ Could not extract body content")
-        return None
+    # Try to extract HTML content using query first
+    html_content = query_typst(typ_file, "<html>")
     
-    # Generate final HTML from template
-    print("   📄 Generating HTML...")
-    env = setup_jinja2_env()
-    template_vars = {
-        'site_title': site_config['title'],
-        'post_title': title,
-        'post_date': date,
-        'post_author': author,
-        'post_content': body_content
-    }
+    if not html_content:
+        # Fallback to compilation method
+        temp_file = Path("dist/blog") / f"{typ_file.stem}.temp.html"
+        if not compile_typst(typ_file, temp_file):
+            return None
+        
+        try:
+            with open(temp_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+            body_match = re.search(r'<body[^>]*>(.*?)</body>', content, re.DOTALL)
+            html_content = body_match.group(1).strip() if body_match else content
+            temp_file.unlink()  # cleanup
+        except Exception as e:
+            print(f"❌ Error extracting body: {e}")
+            return None
     
-    if not render_template(env, "blog-post.html", final_file, template_vars):
-        return None
-    
-    # Clean up temp file
-    if temp_file.exists():
-        temp_file.unlink()
-    
-    print(f"   ✅ Blog post generated successfully: {final_file}")
-    
-    # Return metadata for blog index
     return {
-        'filename': filename,
+        'filename': typ_file.stem,
         'title': title,
+        'desc': desc,
         'date': date,
         'author': author,
-        'excerpt': excerpt
+        'published': published,
+        'tags': tags,
+        'content': html_content
     }
 
-def generate_blog_index(posts_data, site_config):
-    """Generate the blog index page"""
-    print("📋 Generating blog index...")
-    
-    # Sort posts by date (newest first)
-    def parse_date(date_str):
-        """Parse date string to allow sorting"""
+def parse_date(date_str):
+    """Parse date string for sorting"""
+    for fmt in ['%Y-%m-%d', '%Y.%m', '%Y-%m', '%m/%d/%Y', '%m-%d-%Y']:
         try:
-            # Try to parse different date formats
-            from datetime import datetime
-            for fmt in ['%Y-%m-%d', '%Y.%m', '%Y-%m', '%m/%d/%Y', '%m-%d-%Y']:
-                try:
-                    return datetime.strptime(date_str, fmt)
-                except ValueError:
-                    continue
-            # If no format works, return a default old date
-            return datetime(1900, 1, 1)
-        except:
-            return datetime(1900, 1, 1)
-    
-    sorted_posts = sorted(posts_data, key=lambda x: parse_date(x['date']), reverse=True)
-    
-    # Generate blog index page
-    env = setup_jinja2_env()
-    template_vars = {
-        'site_title': site_config['title'],
-        'blog_posts': sorted_posts  # Pass the posts as a list for Jinja2 to iterate
-    }
-    
-    return render_template(
-        env,
-        "blog-index.html", 
-        Path("dist/blog/index.html"), 
-        template_vars
-    )
-
-def compile_typst_section(typ_file):
-    """Compile a Typst file and return the HTML body content"""
-    print(f"🔨 Compiling {typ_file}...")
-    
-    try:
-        # Compile Typst to HTML
-        result = subprocess.run([
-            'typst', 'compile', str(typ_file), 
-            '--format', 'html', 
-            '--features', 'html',
-            '--root', '..',
-            '-'  # Output to stdout
-        ], capture_output=True, text=True, cwd=Path.cwd())
-        
-        if result.returncode != 0:
-            print(f"   ❌ Typst compilation failed: {result.stderr}")
-            return ""
-        
-        # Extract body content
-        html_content = result.stdout
-        body_content = extract_html_body_from_string(html_content)
-        
-        if body_content:
-            print(f"   ✅ Successfully compiled {typ_file}")
-            return body_content
-        else:
-            print(f"   ⚠️  No body content found in {typ_file}")
-            return ""
-            
-    except Exception as e:
-        print(f"   ❌ Error compiling {typ_file}: {e}")
-        return ""
-
-def generate_main_index(site_config):
-    """Generate the main index page"""
-    print("📄 Generating main index page...")
-    
-    # Compile individual Typst sections
-    about_content = compile_typst_section(Path("src/about.typ"))
-    news_content = compile_typst_section(Path("src/news.typ"))
-    cv_content = compile_typst_section(Path("src/cv.typ"))
-    
-    env = setup_jinja2_env()
-    template_vars = {
-        'site_title': site_config['title'],
-        'site_description': site_config['description'],
-        'about_text': site_config['about'],
-        'about_content': about_content,
-        'news_content': news_content,
-        'cv_content': cv_content
-    }
-    
-    return render_template(
-        env,
-        "main-index.html", 
-        Path("dist/index.html"), 
-        template_vars
-    )
-
-def copy_static_assets():
-    """Copy static assets and CSS to dist folder"""
-    print("📦 Copying static assets and styles...")
-    
-    dist_dir = Path("dist")
-    
-    # Copy CSS file
-    try:
-        css_source = Path("src/style.css")
-        css_dest = dist_dir / "style.css"
-        if css_source.exists():
-            shutil.copy2(css_source, css_dest)
-            print("   ✅ Copied style.css")
-        else:
-            print("   ⚠️  Warning: style.css not found in src/")
-    except Exception as e:
-        print(f"   ❌ Failed to copy CSS: {e}")
-        return False
-    
-    # Copy blog-specific CSS for blog pages
-    try:
-        css_source = Path("src/style.css")
-        blog_css_dest = dist_dir / "blog" / "style.css"
-        if css_source.exists():
-            shutil.copy2(css_source, blog_css_dest)
-            print("   ✅ Copied style.css to blog folder")
-    except Exception as e:
-        print(f"   ❌ Failed to copy CSS to blog folder: {e}")
-        return False
-    
-    # Copy profile image p.jpg
-    try:
-        profile_image = Path("src/p.jpg")
-        if profile_image.exists():
-            shutil.copy2(profile_image, dist_dir / "p.jpg")
-            print("   ✅ Copied p.jpg")
-        else:
-            print("   ⚠️  Warning: p.jpg not found in src/ directory")
-    except Exception as e:
-        print(f"   ❌ Failed to copy p.jpg: {e}")
-        return False
-    
-    # Copy static assets
-    static_dir = Path("static")
-    if not static_dir.exists():
-        print("   No static directory found")
-        return True
-    
-    if not any(static_dir.iterdir()):
-        print("   Static directory is empty")
-        return True
-    
-    try:
-        for item in static_dir.iterdir():
-            if item.is_file():
-                shutil.copy2(item, dist_dir / item.name)
-            elif item.is_dir():
-                shutil.copytree(item, dist_dir / item.name, dirs_exist_ok=True)
-        print("   ✅ Copied static assets")
-        return True
-    except Exception as e:
-        print(f"   ❌ Failed to copy static assets: {e}")
-        return False
+            return datetime.strptime(date_str, fmt)
+        except ValueError:
+            continue
+    return datetime(1900, 1, 1)
 
 def main():
-    """Main build function"""
     print("🔨 Building Typst blog...")
-    print("=" * 50)
     
     # Check dependencies
-    check_dependencies()
+    check_typst()
     
-    # Site configuration
-    site_config = {
-        'title': "Xiaotian Han",
-        'description': "A beautiful blog powered by Typst",
-        'about': "This blog showcases the power of Typst for creating beautiful documents and web content. Write in Typst, deploy to the web!"
-    }
-    
-    # Create directories
-    print("📁 Creating directories...")
+    # Setup
+    env = Environment(loader=FileSystemLoader('templates'), autoescape=True, trim_blocks=True, lstrip_blocks=True)
+    site_config = {'title': "Xiaotian Han", 'description': "A beautiful blog powered by Typst"}
     Path("dist/blog").mkdir(parents=True, exist_ok=True)
     
-    # Find and process blog posts
-    print("\n🔨 Processing blog posts...")
+    # Process blog posts
+    blog_posts = []
+    for typ_file in Path("content/blog").glob("*.typ"):
+        post = process_blog_post(typ_file)
+        if post:
+            blog_posts.append(post)
+            # Render individual post
+            env.get_template("blog-post.html").stream(
+                site_title=site_config['title'],
+                post_title=post['title'],
+                post_date=post['date'],
+                post_author=post['author'],
+                post_content=post['content']
+            ).dump(str(Path("dist/blog") / f"{post['filename']}.html"))
     
-    blog_dir = Path("blog")
-    typ_files = list(blog_dir.glob("*.typ"))
+    if not blog_posts:
+        print("❌ No blog posts found")
+        exit(1)
     
-    print("📋 Found .typ files:")
-    for typ_file in typ_files:
-        print(f"   ✓ {typ_file}")
-    print()
+    # Sort posts by date
+    blog_posts.sort(key=lambda x: parse_date(x['date']), reverse=True)
     
-    if not typ_files:
-        print("❌ No .typ files found in blog/ directory")
-        sys.exit(1)
+    # Render blog index
+    env.get_template("blog-index.html").stream(
+        site_title=site_config['title'],
+        blog_posts=blog_posts
+    ).dump("dist/blog/index.html")
     
-    # Process each blog post
-    posts_data = []
-    for typ_file in typ_files:
-        print(f"🔄 Starting processing: {typ_file}")
-        post_data = generate_blog_post(typ_file, site_config)
-        if post_data:
-            posts_data.append(post_data)
-            print(f"   ✅ Successfully processed: {typ_file}")
-        else:
-            print(f"   ❌ Failed to process: {typ_file}")
-        print()
+    # Extract content for main index using queries
+    print("Extracting main index content")
+    about_content = query_typst(Path("content/about.typ"), "<html>") or compile_typst(Path("content/about.typ"))
+    news_content = query_typst(Path("content/news.typ"), "<html>") or compile_typst(Path("content/news.typ"))
+    cv_content = query_typst(Path("content/cv.typ"), "<html>") or compile_typst(Path("content/cv.typ"))
     
-    if not posts_data:
-        print("❌ No blog posts were successfully processed")
-        sys.exit(1)
+    env.get_template("main-index.html").stream(
+        site_title=site_config['title'],
+        about_content=about_content,
+        news_content=news_content,
+        cv_content=cv_content
+    ).dump("dist/index.html")
     
-    print(f"📊 Successfully processed {len(posts_data)} blog post(s)")
-    print()
+    # Copy static files from public folder
+    public_dir = Path("public")
+    if public_dir.exists():
+        for static_file in public_dir.glob("*"):
+            if static_file.is_file():
+                shutil.copy2(static_file, f"dist/{static_file.name}")
+                shutil.copy2(static_file, f"dist/blog/{static_file.name}")
     
-    # Generate blog index
-    if not generate_blog_index(posts_data, site_config):
-        print("❌ Failed to generate blog index")
-        sys.exit(1)
-    
-    # Generate main index
-    if not generate_main_index(site_config):
-        print("❌ Failed to generate main index")
-        sys.exit(1)
-    
-    # Copy static assets
-    if not copy_static_assets():
-        print("❌ Failed to copy static assets")
-        sys.exit(1)
-    
-    print("\n✅ Blog build complete!")
-    print("📂 Output directory: ./dist/")
-    print("📄 Files created:")
-    print("   - dist/index.html (main page)")
-    print("   - dist/style.css (stylesheet)")
-    print("   - dist/blog/index.html (blog index)")
-    print("   - dist/blog/style.css (stylesheet for blog pages)")
-    
-    # List generated blog posts
-    for post in posts_data:
-        print(f"   - dist/blog/{post['filename']}.html (blog post)")
-    
-    print("   - dist/* (static assets)")
-    print()
-    print("🌐 Main page: dist/index.html")
-    print("📖 Blog index: dist/blog/index.html")
+    print(f"✅ Generated {len(blog_posts)} posts")
+    print("🌐 Main: dist/index.html")
+    print("📖 Blog: dist/blog/index.html")
+
 
 if __name__ == "__main__":
     main() 

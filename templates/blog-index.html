@@ -27,7 +27,15 @@
     <h2>All Posts</h2>
     <ul>
         {% for post in blog_posts %}
-        <li><strong>{{ post.date }}</strong>: <a href="{{ post.filename }}.html">{{ post.title }}</a></li>
+        <li>
+            <strong>{{ post.date }}</strong>: <a href="{{ post.filename }}.html">{{ post.title }}</a>
+            <!-- {% if post.desc %}
+            <br><small style="color: #666; margin-left: 1rem;">{{ post.desc }}</small>
+            {% endif %}
+            {% if post.tags %}
+            <br><small style="color: #888; margin-left: 1rem;">Tags: {{ post.tags | join(', ') }}</small>
+            {% endif %} -->
+        </li>
         {% endfor %}
     </ul>
 </section>

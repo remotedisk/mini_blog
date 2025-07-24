@@ -1,10 +1,9 @@
-// Blog Post Metadata
-// title: Introduction to Typst
-// date: 2024-07-23
-// author: Blog Author
-// excerpt: Recent developments in typesetting software have rekindled hope in previously frustrated researchers. This post explores Typst's capabilities and demonstrates various features.
+#import "../3rd_party/mathyml/lib.typ": *
+#import "../3rd_party/mathyml/lib.typ" as mathyml
+#import mathyml.prelude:*
 
-#import "./3rd_party/mathyml/lib.typ": *
+#show math.equation: to-mathml
+
 
 
 #metadata("Introduction to Typst") <meta:title>

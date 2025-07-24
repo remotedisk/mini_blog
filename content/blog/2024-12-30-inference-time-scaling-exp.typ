@@ -1,6 +1,6 @@
 // #import "/content/blog.typ": *
-#import "./3rd_party/mathyml/lib.typ" as mathyml
-#import "./3rd_party/mathyml/lib.typ": *
+#import "../3rd_party/mathyml/lib.typ" as mathyml
+#import "../3rd_party/mathyml/lib.typ": *
 #import mathyml.prelude:*
 #show math.equation: to-mathml
 
