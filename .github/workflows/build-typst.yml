@@ -14,11 +14,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     
-    # Required for GitHub Pages deployment
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    
     # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
     concurrency:
       group: "pages"
@@ -178,4 +173,16 @@ jobs:
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
       id: deployment
       uses: actions/deploy-pages@v2
+      
+    - name: Display deployment URL
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      run: |
+        echo "🚀 Deployment successful!"
+        echo "📄 Your Typst document is now available at:"
+        echo "🔗 ${{ steps.deployment.outputs.page_url }}"
+        echo ""
+        echo "## 🎉 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "✅ **Status:** Successfully deployed" >> $GITHUB_STEP_SUMMARY
+        echo "🔗 **URL:** ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
+        echo "📝 **Document:** test.html" >> $GITHUB_STEP_SUMMARY
         

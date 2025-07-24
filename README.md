@@ -167,8 +167,9 @@ The generated HTML includes basic styling. You can customize:
 - **Cache issues**: If builds are inconsistent, the cache key includes the git reference to avoid conflicts
 
 **Environment setup:**
-- The workflow automatically creates a `github-pages` environment
-- Deployment URL will be available in the workflow output
+- The `github-pages` environment is created automatically during first deployment
+- If you see "environment not found" errors, this is normal for the first run
+- Deployment URL will be displayed in the workflow output
 - Uses official GitHub Pages actions for reliable deployment
 
 ### Logs and Debugging
