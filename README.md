@@ -20,15 +20,10 @@ The GitHub workflow automatically:
 1. **Enable GitHub Pages:**
    - Go to your repository settings
    - Navigate to "Pages" in the left sidebar
-   - Under "Source", select "Deploy from a branch"
-   - Choose "gh-pages" as the branch
+   - Under "Source", select "GitHub Actions"
    - Click "Save"
    
-   **Important**: Also ensure GitHub Actions has proper permissions:
-   - Go to Settings → Actions → General
-   - Under "Workflow permissions", select "Read and write permissions"
-   - Check "Allow GitHub Actions to create and approve pull requests"
-   - Click "Save"
+   **Note**: The workflow now uses the official GitHub Pages deployment method, which works better with default permissions.
 
 2. **Push your changes:**
    ```bash
@@ -147,11 +142,10 @@ The generated HTML includes basic styling. You can customize:
 - Ensure the repository is public (or GitHub Pages is available for private repos)
 - Verify GitHub Actions has "Read and write permissions" in repository settings
 
-**Permission denied errors:**
-- Go to Settings → Actions → General → Workflow permissions
-- Select "Read and write permissions" 
-- Enable "Allow GitHub Actions to create and approve pull requests"
-- Re-run the failed workflow
+**Deployment issues:**
+- Make sure "GitHub Actions" is selected as the Pages source (not "Deploy from a branch")
+- The workflow now uses the official GitHub Actions deployment method
+- If you see permission errors, ensure Pages is enabled in repository settings
 
 **Images not displaying:**
 - Make sure image files (like `glacier.jpg`) are committed to the repository
