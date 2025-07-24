@@ -13,11 +13,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-    concurrency:
-      group: "pages"
-      cancel-in-progress: false
+  
     
     permissions:
       contents: read
