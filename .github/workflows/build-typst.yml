@@ -23,42 +23,48 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       
-    - name: Setup Rust toolchain
-      uses: actions-rs/toolchain@v1
+    # - name: Setup Rust toolchain
+    #   uses: actions-rs/toolchain@v1
+    #   with:
+    #     toolchain: stable
+    #     override: true
+
+    # - name: Clone and build Typst from source
+    #   run: |
+    #     # Clone Typst repository
+    #     git clone https://github.com/typst/typst.git typst-source
+    #     cd typst-source
+        
+    #     # Checkout specified ref (version tag, commit hash, or branch) from environment variable
+    #     echo "Building Typst from ref: $TYPST_REF"
+    #     git checkout $TYPST_REF
+        
+    #     # Build Typst CLI
+    #     echo "Building Typst CLI..."
+    #     cargo build --release --package typst-cli
+        
+    #     # Copy the binary to a location in PATH
+    #     sudo cp target/release/typst /usr/local/bin/typst
+        
+    #     # Verify installation
+    #     echo "Typst installation complete:"
+    #     typst --version
+        
+
+    - name: 📁 Prepare cargo cache
+      uses: awalsh128/cache-apt-pkgs-action@v1
       with:
-        toolchain: stable
-        override: true
-        
-    - name: Cache Rust dependencies
-      uses: actions/cache@v3
+        packages: cargo
+        version: 1.0
+
+    - name: 📥 Install typst-test from GitHub
+      uses: baptiste0928/cargo-install@91c5da15570085bcde6f4d7aed98cb82d6769fd3
       with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          typst-source/target
-        key: ${{ runner.os }}-typst-cargo-${{ env.TYPST_REF }}
-        
-    - name: Clone and build Typst from source
-      run: |
-        # Clone Typst repository
-        git clone https://github.com/typst/typst.git typst-source
-        cd typst-source
-        
-        # Checkout specified ref (version tag, commit hash, or branch) from environment variable
-        echo "Building Typst from ref: $TYPST_REF"
-        git checkout $TYPST_REF
-        
-        # Build Typst CLI
-        echo "Building Typst CLI..."
-        cargo build --release --package typst-cli
-        
-        # Copy the binary to a location in PATH
-        sudo cp target/release/typst /usr/local/bin/typst
-        
-        # Verify installation
-        echo "Typst installation complete:"
-        typst --version
-        
+        crate: typst-cli
+        git: https://github.com/typst/typst.git
+        commit: 7278d887cf05fadc9a96478830e5876739b78f53
+
+
     - name: Compile Typst to HTML
       run: |
         # Compile to HTML (native Typst HTML export - experimental)
