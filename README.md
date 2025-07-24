@@ -112,7 +112,7 @@ env:
 
 ### Artifacts
 After each workflow run, you can download:
-- The generated HTML document and assets as a zip archive
+- The generated HTML document and assets as a zip archive (from the `dist/` directory)
 
 ## 📝 Customizing
 

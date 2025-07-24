@@ -159,13 +159,3 @@ jobs:
         allow_empty_commit: false
         force_orphan: true
         
-    # Alternative deployment method if the above fails:
-    # - name: Setup Pages
-    #   uses: actions/configure-pages@v3
-    # - name: Upload to GitHub Pages
-    #   uses: actions/upload-pages-artifact@v2
-    #   with:
-    #     path: deploy
-    # - name: Deploy to GitHub Pages
-    #   id: deployment
-    #   uses: actions/deploy-pages@v2 
