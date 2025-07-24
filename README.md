@@ -1,12 +1,23 @@
 # Mini Blog - Typst to HTML
 
-A simple blog setup that compiles Typst documents to HTML with GitHub Actions deployment.
+A beautiful blog system powered by Typst that automatically compiles your documents to HTML and deploys them with GitHub Actions.
 
 ## 🚀 Local Development
 
 ### Prerequisites
 
-1. **Install Typst** (choose one option):
+1. **Install Python 3** (required for template processing):
+   ```bash
+   # Python 3 comes pre-installed on most systems
+   python3 --version  # Check if installed
+   
+   # If not installed:
+   # macOS: brew install python3
+   # Ubuntu/Debian: apt install python3
+   # Windows: Download from python.org
+   ```
+
+2. **Install Typst** (choose one option):
 
    **Option A: From releases (easier)**
    ```bash
@@ -38,30 +49,25 @@ A simple blog setup that compiles Typst documents to HTML with GitHub Actions de
    ./dev.sh
    ```
    This will:
-   - ✅ Build the project using `build.sh`
-   - 📁 Create `dist/` folder with output
+   - ✅ Build the entire blog using `build.sh`
+   - 📁 Create `dist/` folder with the complete site
    - 🌐 Start local server at `http://localhost:8000`
 
 2. **Just build (without server):**
    ```bash
-   ./build.sh local
+   python3 build.py local
    ```
 
 3. **Build for production:**
    ```bash
-   ./build.sh production
+   python3 build.py production
    ```
 
 ### Manual Commands
 
 ```bash
-# Build the project
-./build.sh local
-
-# Or manually:
-mkdir -p dist
-TYPST_FEATURES=html typst compile blog/test.typ dist/test.html --format html --features html
-# ... (see build.sh for full process)
+# Build the entire blog
+python3 build.py local
 
 # Serve locally
 python3 -m http.server 8000 -d dist
@@ -74,49 +80,88 @@ mini_blog/
 ├── .github/workflows/
 │   └── build-typst.yml     # GitHub Actions workflow
 ├── blog/
-│   └── test.typ            # Your Typst documents
+│   ├── test.typ            # Example blog post
+│   └── getting-started.typ # Another blog post
 ├── static/
 │   └── glacier.jpg         # Static assets (images, etc.)
 ├── src/
-│   └── index-template.html # HTML template for index page
+│   ├── main-index.html     # Main page template
+│   ├── blog-index.html     # Blog index template
+│   └── blog-post.html      # Individual blog post template
 ├── dist/                   # Build output (auto-generated)
-│   ├── test.html          # Compiled HTML
-│   ├── index.html         # Generated redirect page
-│   └── glacier.jpg        # Copied static assets
-├── build.sh               # Shared build script
+│   ├── index.html          # Main page
+│   ├── blog/
+│   │   ├── index.html      # Blog index
+│   │   ├── test.html       # Compiled blog posts
+│   │   └── getting-started.html
+│   └── glacier.jpg         # Copied static assets
+├── build.py               # Blog build script (Python)
 ├── dev.sh                 # Development script with server
 └── README.md              # This file
 ```
 
 ## 🔧 Development Workflow
 
-1. **Edit** Typst documents in the `blog/` folder
-2. **Add assets** (images, etc.) to the `static/` folder
-3. **Customize** HTML templates in the `src/` folder
-4. **Run** `./dev.sh` to build and serve
-5. **Rebuild** with `./build.sh local` as needed
-6. **Commit** changes to trigger GitHub Actions deployment
+1. **Write blog posts** in the `blog/` folder as `.typ` files
+2. **Add metadata** to each post (see format below)
+3. **Add assets** (images, etc.) to the `static/` folder
+4. **Customize** templates in the `src/` folder
+5. **Run** `./dev.sh` to build and serve
+6. **Rebuild** with `python3 build.py local` as needed
+7. **Commit** changes to trigger GitHub Actions deployment
 
-## 🌐 Production Deployment
+## 📝 Writing Blog Posts
 
-The workflow automatically deploys to GitHub Pages when you push to the main branch:
+### Blog Post Format
 
-1. **Enable GitHub Pages:**
-   - Go to repository Settings → Pages
-   - Set Source to "GitHub Actions"
-   - Save
+Each blog post should be a `.typ` file in the `blog/` folder with metadata at the top:
 
-2. **Push changes:**
-   ```bash
-   git add .
-   git commit -m "Update content"
-   git push origin main
-   ```
+```typst
+// Blog Post Metadata
+// title: Your Post Title
+// date: YYYY-MM-DD
+// author: Your Name
+// excerpt: A brief description that appears in the blog index...
 
-3. **View deployed site:**
-   - `https://yourusername.github.io/yourrepository`
+= Your Post Title
 
-## 📝 Adding Content
+Your post content goes here in Typst format.
+
+== Subheading
+
+You can use all Typst features:
+- Lists
+- *Bold* and _italic_ text
+- Math: $E = m c^2$
+- Code blocks
+- Tables
+- Images
+```
+
+### Example Blog Post
+
+```typst
+// Blog Post Metadata
+// title: Getting Started with Typst
+// date: 2024-07-23
+// author: Jane Doe
+// excerpt: Learn the basics of writing beautiful documents with Typst markup language.
+
+= Getting Started with Typst
+
+Welcome to the world of beautiful typography!
+
+== Math Support
+
+Typst has excellent math support: $integral_0^infinity e^(-x^2) dif x = sqrt(pi)/2$
+
+== Code Examples
+
+```python
+def hello_world():
+    print("Hello from Typst!")
+```
+```
 
 ### Text and Formatting
 ```typst
@@ -150,49 +195,85 @@ Place images in the `static/` folder, then reference them:
 )
 ```
 
-## 🎨 Customizing the Template
+## 🎨 Customizing Templates
 
-The HTML template is modular and easy to customize:
+The blog uses three main templates in the `src/` folder:
 
-1. **Edit the template**: `src/index-template.html`
-2. **Template variables**:
-   - `{{ENVIRONMENT_TEXT}}` - Environment description
-   - `{{BADGE_CLASS}}` - CSS class for the badge
-   - `{{BADGE_TEXT}}` - Text shown in the badge
-   - `{{DESCRIPTION}}` - Footer description
+### 1. Main Index (`src/main-index.html`)
+The homepage of your blog. Variables:
+- `{{SITE_TITLE}}` - Site title
+- `{{SITE_DESCRIPTION}}` - Site description
+- `{{ABOUT_TEXT}}` - About section text
+- `{{ENVIRONMENT}}` - Build environment
 
-The `build.sh` script automatically replaces these variables based on the environment (local/production).
+### 2. Blog Index (`src/blog-index.html`)
+Lists all blog posts. Variables:
+- `{{SITE_TITLE}}` - Site title
+- `{{BLOG_POSTS}}` - Generated list of blog posts
+- `{{ENVIRONMENT}}` - Build environment
 
-### Example: Custom Badge Colors
-Edit `src/index-template.html`:
-```css
-.local {
-    background: #ff9500;  /* Orange for local */
-}
-.experimental {
-    background: #28a745;  /* Green for production */
+### 3. Blog Post (`src/blog-post.html`)
+Individual blog post layout. Variables:
+- `{{SITE_TITLE}}` - Site title
+- `{{POST_TITLE}}` - Post title
+- `{{POST_DATE}}` - Post date
+- `{{POST_AUTHOR}}` - Post author
+- `{{POST_CONTENT}}` - Compiled Typst content
+- `{{ENVIRONMENT}}` - Build environment
+
+### Customizing Site Information
+
+Edit the site configuration in `build.py`:
+```python
+site_config = {
+    'title': "Your Blog Name",
+    'description': "Your blog description", 
+    'about': "About your blog..."
 }
 ```
+
+## 🌐 Production Deployment
+
+The workflow automatically deploys to GitHub Pages when you push to the main branch:
+
+1. **Enable GitHub Pages:**
+   - Go to repository Settings → Pages
+   - Set Source to "GitHub Actions"
+   - Save
+
+2. **Push changes:**
+   ```bash
+   git add .
+   git commit -m "Add new blog post"
+   git push origin main
+   ```
+
+3. **View deployed site:**
+   - `https://yourusername.github.io/yourrepository`
 
 ## 🛠️ Build Script
 
-The `build.sh` script is the core of the build process:
+The `build.py` script handles the complete blog build process using Python for better reliability:
 
 ```bash
 # Usage
-./build.sh [local|production]
+python3 build.py [local|production]
 
 # Examples
-./build.sh local      # Local development build
-./build.sh production # Production build for deployment
+python3 build.py local      # Local development build
+python3 build.py production # Production build for deployment
 ```
 
 **What it does:**
-- ✅ Checks Typst installation
-- 🔨 Compiles Typst documents to HTML
-- 📄 Generates index.html from template
+- ✅ Scans `blog/` folder for `.typ` files
+- 🔍 Extracts metadata from each post
+- 🔨 Compiles each post to HTML using Typst
+- 📝 Wraps compiled content in blog post template
+- 📋 Generates blog index with all posts
+- 🏠 Creates main index page
 - 📦 Copies static assets
 - 🎯 Environment-specific configuration
+- 🐛 Better error handling and debugging output
 
 ## 🛠️ Troubleshooting
 
@@ -200,13 +281,26 @@ The `build.sh` script is the core of the build process:
 - Make sure Typst is installed and in your PATH
 - Try: `typst --version`
 
+**Python not found:**
+- Make sure Python 3 is installed and in your PATH
+- Try: `python3 --version`
+
 **Build script issues:**
-- Make sure scripts are executable: `chmod +x build.sh dev.sh`
-- Check that all required files exist: `blog/test.typ`, `src/index-template.html`, `static/`
+- Make sure Python 3 is installed and accessible
+- Check that blog posts have proper metadata format
+- Ensure template files exist in `src/` folder
+- Run `python3 build.py local` to see detailed error messages
+
+**Blog post not appearing:**
+- Check metadata format at the top of your `.typ` file
+- Ensure the file is in the `blog/` folder
+- Verify the date format is YYYY-MM-DD
+- Rebuild with `python3 build.py local` for detailed debugging output
 
 **Template issues:**
-- Check template syntax in `src/index-template.html`
+- Check template syntax in `src/` templates
 - Ensure template variables use the correct `{{VARIABLE}}` format
+- Check for typos in variable names
 
 **Local server issues:**
 - Try different ports: `python3 -m http.server 3000 -d dist`
@@ -214,11 +308,26 @@ The `build.sh` script is the core of the build process:
 
 ## ⚡ Tips
 
+- **Multiple posts**: Add as many `.typ` files as you want to the `blog/` folder
+- **Chronological order**: Posts are sorted by filename, consider using date prefixes
+- **Draft posts**: Remove or comment out metadata to exclude posts from the index
+- **Rich content**: Use all Typst features - math, tables, figures, code blocks
 - **Fast iteration**: Use `./dev.sh` for build + serve in one command
 - **Version control**: The `dist/` folder is ignored by git (build artifacts)
 - **Organized assets**: Keep images and other assets in the `static/` folder
-- **Multiple documents**: Add more `.typ` files to the `blog/` folder and extend `build.sh`
-- **Shared build logic**: Both local development and CI use the same `build.sh` script
-- **Environment awareness**: The build script automatically adjusts styling for local vs. production
+- **Shared build logic**: Both local development and CI use the same `build.py` script
+- **SEO friendly**: Each post gets its own HTML page with proper meta tags
 
-Enjoy writing with Typst! 🎉 
+## 🎯 Blog Features
+
+- **📝 Easy writing**: Write in Typst markup language
+- **🎨 Beautiful typography**: Professional-quality output
+- **📊 Math support**: LaTeX-quality mathematical expressions
+- **💻 Code highlighting**: Syntax highlighting for code blocks
+- **📱 Responsive design**: Looks great on all devices
+- **🚀 Fast deployment**: Automatic GitHub Actions deployment
+- **🔍 SEO friendly**: Proper HTML structure and meta tags
+- **📑 Blog index**: Automatic generation of post listing
+- **🏷️ Metadata support**: Title, date, author, excerpt for each post
+
+Enjoy blogging with Typst! 🎉 

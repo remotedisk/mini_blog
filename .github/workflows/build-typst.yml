@@ -67,9 +67,8 @@ jobs:
 
     - name: Build Typst project
       run: |
-        # Make build script executable and run it for production
-        chmod +x build.sh
-        ./build.sh production
+        # Run Python build script for production
+        python3 build.py production
         
     - name: Prepare deployment directory
       run: |

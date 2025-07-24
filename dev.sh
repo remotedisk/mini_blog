@@ -1,13 +1,14 @@
 #!/bin/bash
 
 # Typst Local Development Script
+
 set -e
 
 echo "🔧 Typst Local Development"
 echo "=========================="
 
-# Build the project using shared build script
-./build.sh local
+# Build the project using Python build script
+python3 build.py local
 
 echo ""
 echo "🌐 Starting local server..."

@@ -1,3 +1,9 @@
+// Blog Post Metadata
+// title: Introduction to Typst
+// date: 2024-07-23
+// author: Blog Author
+// excerpt: Recent developments in typesetting software have rekindled hope in previously frustrated researchers. This post explores Typst's capabilities and demonstrates various features.
+
 #set heading(numbering: "1.")
 
 #outline(title: none)
