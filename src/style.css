@@ -24,7 +24,7 @@
 
 
 body {
-  --vp-font-family-base: -apple-system, BlinkMacSystemFont, "Source Sans Pro", "Source Sans Pro Variable", "Noto Sans SC", "PingFang SC", "Microsoft Yahei", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --vp-font-family-base: "Rival Sans", "Source Sans Pro", "Source Sans Pro Variable", "Noto Sans SC", "PingFang SC", "Microsoft Yahei", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --vp-font-family-mono: ui-monospace, "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", monospace;
 
   font-family: var(--vp-font-family-base);
