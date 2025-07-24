@@ -1,0 +1,149 @@
+name: Build Typst to HTML
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  TYPST_REF: 7278d887cf05fadc9a96478830e5876739b78f53  # Change this to your desired Typst version, commit hash, or branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+        
+    - name: Cache Rust dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          typst-source/target
+        key: ${{ runner.os }}-typst-cargo-${{ env.TYPST_REF }}
+        
+    - name: Clone and build Typst from source
+      run: |
+        # Clone Typst repository
+        git clone https://github.com/typst/typst.git typst-source
+        cd typst-source
+        
+        # Checkout specified ref (version tag, commit hash, or branch) from environment variable
+        echo "Building Typst from ref: $TYPST_REF"
+        git checkout $TYPST_REF
+        
+        # Build Typst CLI
+        echo "Building Typst CLI..."
+        cargo build --release --package typst-cli
+        
+        # Copy the binary to a location in PATH
+        sudo cp target/release/typst /usr/local/bin/typst
+        
+        # Verify installation
+        echo "Typst installation complete:"
+        typst --version
+        
+    - name: Compile Typst to HTML
+      run: |
+        # Compile to HTML (native Typst HTML export - experimental)
+        TYPST_FEATURES=html typst compile test.typ test.html --format html --features html
+        
+    - name: Create index.html redirect
+      run: |
+        cat > index.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Typst Document - Redirecting...</title>
+            <meta http-equiv="refresh" content="0; url=test.html">
+            <style>
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    background-color: #f5f5f5;
+                    text-align: center;
+                }
+                .card {
+                    background: white;
+                    padding: 20px;
+                    margin: 20px 0;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                }
+                .view-btn {
+                    display: inline-block;
+                    padding: 15px 30px;
+                    background: #007acc;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    margin: 5px;
+                    font-size: 16px;
+                }
+                .view-btn:hover {
+                    background: #005999;
+                }
+                .experimental {
+                    background: #ff9500;
+                    color: white;
+                    padding: 2px 6px;
+                    border-radius: 3px;
+                    font-size: 11px;
+                    font-weight: bold;
+                    margin-left: 5px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h1>Typst Document: test.typ</h1>
+                <p>Redirecting to the HTML version...</p>
+                <p>If you're not redirected automatically, click below:</p>
+                <a href="test.html" class="view-btn">🌐 View Document <span class="experimental">EXPERIMENTAL</span></a>
+                
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; font-size: 14px; color: #666;">
+                    <p>This document was compiled from Typst source code using GitHub Actions and native Typst HTML export.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        EOF
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: typst-html-output
+        path: |
+          test.html
+          index.html
+          glacier.jpg
+          
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: .
+        publish_branch: gh-pages
+        keep_files: false
+        allow_empty_commit: false
+        force_orphan: true
+        include_files: |
+          index.html
+          test.html
+          glacier.jpg 
