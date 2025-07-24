@@ -1,3 +1,9 @@
+#import "../blog/3rd_party/mathyml/lib.typ": *
+#import "../blog/3rd_party/mathyml/lib.typ" as mathyml
+#import mathyml.prelude:*
+
+#show math.equation: to-mathml
+
 === Selected Publications(#link("https://scholar.google.com/citations?hl=en&user=Uromx98AAAAJ&view_op=list_works&sortby=pubdate")[Google Scholar])
 
 #table(
@@ -90,7 +96,7 @@
   [], [_Transactions on Machine Learning Research (TMLR)_, 2023],
   [],[],
 
-  [*[ICML2022]*], [#link("https://arxiv.org/pdf/2202.07179.pdf")[$cal(G)$G-Mixup: Graph Augmentation for Graph Classification]],
+  [*[ICML2022]*], [#link("https://arxiv.org/pdf/2202.07179.pdf")[$cal(G)$-Mixup: Graph Augmentation for Graph Classification]],
   [], [*Xiaotian Han*, Zhimeng Jiang, Ninghao Liu, Xia Hu],
   [], [_International Conference on Machine Learning (ICML)_, 2022],
   [], [#text(red)[*ICML2022 Outstanding Paper Award*]],

@@ -1,3 +1,10 @@
+#import "../blog/3rd_party/mathyml/lib.typ": *
+#import "../blog/3rd_party/mathyml/lib.typ" as mathyml
+#import mathyml.prelude:*
+
+#show math.equation: to-mathml
+
+
 === 🔥 News
 - *2025.06*: I developed a #link("https://typst.app/")[Typst]-based homepage template and migrated my website to it! Check out #link("https://github.com/ahxt/academic-homepage-typst")[github repo]!
 - *2025.05*: New preprints on #link("https://arxiv.org/abs/2504.12329")[Speculative Thinking], #link("https://arxiv.org/abs/2505.17296")[SELF], and #link("https://www.arxiv.org/abs/2505.17315")[Longer Context, Deeper Thinking] form my group are out!

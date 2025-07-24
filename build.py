@@ -75,11 +75,12 @@ def compile_typst_post(typ_file, output_file):
         output_path = output_file.resolve()
         
         result = subprocess.run([
-            'typst', 'compile', 
+            'typst', 'compile',
             typ_filename, 
             str(output_path),
             '--format', 'html',
-            '--features', 'html'
+            '--features', 'html',
+            '--root', '..'
         ], env=env, capture_output=True, text=True, cwd=str(typ_dir))
         
         if result.returncode != 0:
@@ -269,6 +270,7 @@ def compile_typst_section(typ_file):
             'typst', 'compile', str(typ_file), 
             '--format', 'html', 
             '--features', 'html',
+            '--root', '..',
             '-'  # Output to stdout
         ], capture_output=True, text=True, cwd=Path.cwd())
         
@@ -344,6 +346,18 @@ def copy_static_assets():
             print("   ✅ Copied style.css to blog folder")
     except Exception as e:
         print(f"   ❌ Failed to copy CSS to blog folder: {e}")
+        return False
+    
+    # Copy profile image p.jpg
+    try:
+        profile_image = Path("src/p.jpg")
+        if profile_image.exists():
+            shutil.copy2(profile_image, dist_dir / "p.jpg")
+            print("   ✅ Copied p.jpg")
+        else:
+            print("   ⚠️  Warning: p.jpg not found in src/ directory")
+    except Exception as e:
+        print(f"   ❌ Failed to copy p.jpg: {e}")
         return False
     
     # Copy static assets
