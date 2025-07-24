@@ -1,6 +1,25 @@
-# Mini Blog - Typst to HTML
+# Typst Academic Homepage
 
-A clean, academic-style blog system powered by Typst that automatically compiles your documents to HTML and deploys them with GitHub Actions. Features a minimal design inspired by academic homepages.
+A clean, academic-style homepage and blog system powered by [Typst](https://typst.app/) with modular content sections and automatic compilation. Perfect for researchers, academics, and professionals who want a beautiful, maintainable website.
+
+## ✨ Features
+
+- 🎓 **Academic Design** — Clean, professional layout inspired by academic websites
+- ✍️ **Modular Content** — Separate Typst files for about, news, CV, and blog posts
+- 🚀 **Auto Compilation** — GitHub Actions automatically builds and deploys
+- 📱 **Responsive Design** — Mobile-friendly academic layout
+- 🧮 **Math Support** — LaTeX-quality mathematical expressions
+- 📊 **Bear Blog Styling** — Modern, clean typography with excellent readability
+
+## 📁 Content Structure
+
+Your content is organized in separate Typst files:
+
+- **`src/about.typ`** — About section with bio and links
+- **`src/news.typ`** — News and announcements 
+- **`src/cv.typ`** — Publications, education, experience, awards
+- **`blog/*.typ`** — Individual blog posts
+- **`static/`** — Images and other assets
 
 ## 🚀 Local Development
 
@@ -43,22 +62,38 @@ A clean, academic-style blog system powered by Typst that automatically compiles
 
 ### Quick Start
 
-1. **Build and serve:**
+1. **Edit your content:**
    ```bash
-   chmod +x build.sh dev.sh
+   # Edit your bio and social links
+   nano src/about.typ
+   
+   # Update your news and announcements
+   nano src/news.typ
+   
+   # Add publications and CV information
+   nano src/cv.typ
+   
+   # Create blog posts
+   nano blog/my-new-post.typ
+   ```
+
+2. **Build and serve:**
+   ```bash
+   chmod +x dev.sh
    ./dev.sh
    ```
    This will:
-   - ✅ Build the entire blog using `build.sh`
-   - 📁 Create `dist/` folder with the complete site
+   - ✅ Compile all Typst content (about, news, CV, blog posts)
+   - 📁 Generate integrated homepage and blog
+   - 📄 Create `dist/` folder with the complete site
    - 🌐 Start local server at `http://localhost:8000`
 
-2. **Just build (without server):**
+3. **Just build (without server):**
    ```bash
    python3 build.py local
    ```
 
-3. **Build for production:**
+4. **Build for production:**
    ```bash
    python3 build.py production
    ```

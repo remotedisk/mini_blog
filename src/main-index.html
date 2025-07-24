@@ -7,52 +7,47 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="top-header">
-        <a href="/" class="site-title">{{SITE_TITLE}}</a>
-        <nav class="top-nav">
-            <a href="#about">About</a>
-            <a href="blog/">Blog</a>
-        </nav>
-    </div>
-    
-    <div class="content">
-        <section class="header">
-            <p>Hi there!</p>
-            <p>{{SITE_DESCRIPTION}} This site demonstrates the power of Typst for creating beautiful documents and web content with automatic compilation and GitHub Pages deployment.</p>
-            
-            <div class="social-links">
-                <a href="https://typst.app">typst</a> / 
-                <a href="https://github.com">github</a> / 
-                <a href="blog/">blog</a>
+    <header>
+        <nav>
+            <div class="logo-container">
+                <a href="/" class="logo-link">
+                    <h1 class="logo-text">{{SITE_TITLE}}</h1>
+                </a>
             </div>
+            <div class="internal-links">
+                <a href="#about" class="nav-link">
+                    <span class="nav-text">About</span>
+                </a>
+                <a href="blog/" class="nav-link">
+                    <span class="nav-text">Blog</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="about-section">
+            {{ABOUT_CONTENT}}
         </section>
         
-        <section class="section news-section">
-            <h2>News</h2>
-            <ul class="news-list">
-                <li><span class="news-date">2024.07</span>: Created this Typst-powered blog system with academic-style design!</li>
-                <li><span class="news-date">2024.07</span>: Implemented automatic compilation from Typst to HTML using GitHub Actions.</li>
-                <li><span class="news-date">2024.07</span>: Added support for mathematical expressions and clean typography.</li>
-                <li><span class="news-date">2024.07</span>: Blog system ready for academic writing and research documentation.</li>
-            </ul>
+        <section aria-label="News">
+            {{NEWS_CONTENT}}
         </section>
         
-        <section class="section">
-            <h2>Features</h2>
-            <ul>
-                <li><strong>Typst markup</strong> — Write in clean, modern markup language</li>
-                <li><strong>Automatic compilation</strong> — Build process handles HTML generation</li>
-                <li><strong>GitHub Pages deployment</strong> — Seamless publishing workflow</li>
-                <li><strong>Beautiful typography</strong> — Professional-quality document rendering</li>
-                <li><strong>Math support</strong> — LaTeX-quality mathematical expressions</li>
-            </ul>
+        <section aria-label="CV">
+            {{CV_CONTENT}}
         </section>
         
-        <section class="section" id="about">
-            <h2>About This Blog</h2>
-            <p>{{ABOUT_TEXT}}</p>
-            <p class="text-muted text-small">Built with Typst • Environment: {{ENVIRONMENT}}</p>
+        <section>
+            <h2>Blog</h2>
+            <p>Check out my <a href="blog/">blog posts</a> about research, tutorials, and technical insights.</p>
         </section>
-    </div>
+        
+        <footer>
+            <div class="footer-content">
+                <p style="color: var(--gray-color); font-size: 0.9em; text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--raw-bg-color);">Built with Typst • Environment: {{ENVIRONMENT}}</p>
+            </div>
+        </footer>
+    </main>
 </body>
 </html> 

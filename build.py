@@ -89,6 +89,19 @@ def extract_html_body(html_file):
         print(f"   ❌ Could not extract HTML body: {e}")
         return ""
 
+def extract_html_body_from_string(html_content):
+    """Extract body content from HTML string"""
+    try:
+        # Extract body content
+        body_match = re.search(r'<body[^>]*>(.*?)</body>', html_content, re.DOTALL)
+        if body_match:
+            return body_match.group(1).strip()
+        return html_content.strip()
+        
+    except Exception as e:
+        print(f"   ❌ Could not extract HTML body from string: {e}")
+        return ""
+
 def process_template(template_file, output_file, variables):
     """Process a template file with variable substitution"""
     try:
@@ -187,11 +200,13 @@ def generate_blog_index(posts_data, site_config, environment):
     posts_html = ""
     for post in posts_data:
         posts_html += f'''
-        <div class="post-item">
-            <h3 class="post-title"><a href="{post['filename']}.html">{post['title']}</a></h3>
-            <div class="post-meta">{post['date']} • {post['author']}</div>
-            <div class="post-excerpt">{post['excerpt']} <a href="{post['filename']}.html" class="read-more">Read more →</a></div>
-        </div>'''
+                <li>
+                    <div class="heading">
+                        <h4><a href="{post['filename']}.html">{post['title']}</a></h4>
+                        <span class="date">{post['date']}</span>
+                    </div>
+                    <p class="description">{post['excerpt']} <a href="{post['filename']}.html">Read more →</a></p>
+                </li>'''
     
     # Generate blog index page
     template_vars = {
@@ -206,14 +221,54 @@ def generate_blog_index(posts_data, site_config, environment):
         template_vars
     )
 
+def compile_typst_section(typ_file):
+    """Compile a Typst file and return the HTML body content"""
+    print(f"🔨 Compiling {typ_file}...")
+    
+    try:
+        # Compile Typst to HTML
+        result = subprocess.run([
+            'typst', 'compile', str(typ_file), 
+            '--format', 'html', 
+            '--features', 'html',
+            '-'  # Output to stdout
+        ], capture_output=True, text=True, cwd=Path.cwd())
+        
+        if result.returncode != 0:
+            print(f"   ❌ Typst compilation failed: {result.stderr}")
+            return ""
+        
+        # Extract body content
+        html_content = result.stdout
+        body_content = extract_html_body_from_string(html_content)
+        
+        if body_content:
+            print(f"   ✅ Successfully compiled {typ_file}")
+            return body_content
+        else:
+            print(f"   ⚠️  No body content found in {typ_file}")
+            return ""
+            
+    except Exception as e:
+        print(f"   ❌ Error compiling {typ_file}: {e}")
+        return ""
+
 def generate_main_index(site_config, environment):
     """Generate the main index page"""
     print("📄 Generating main index page...")
+    
+    # Compile individual Typst sections
+    about_content = compile_typst_section(Path("src/about.typ"))
+    news_content = compile_typst_section(Path("src/news.typ"))
+    cv_content = compile_typst_section(Path("src/cv.typ"))
     
     template_vars = {
         'SITE_TITLE': site_config['title'],
         'SITE_DESCRIPTION': site_config['description'],
         'ABOUT_TEXT': site_config['about'],
+        'ABOUT_CONTENT': about_content,
+        'NEWS_CONTENT': news_content,
+        'CV_CONTENT': cv_content,
         'ENVIRONMENT': environment
     }
     
