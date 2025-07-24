@@ -65,87 +65,14 @@ jobs:
         git: https://github.com/typst/typst.git
         commit: 7278d887cf05fadc9a96478830e5876739b78f53
 
-
-    - name: Compile Typst to HTML
+    - name: Build Typst project
       run: |
-        # Compile to HTML (native Typst HTML export - experimental)
-        TYPST_FEATURES=html typst compile test.typ test.html --format html --features html
-        
-    - name: Create index.html redirect
-      run: |
-        cat > index.html << 'EOF'
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Typst Document - Redirecting...</title>
-            <meta http-equiv="refresh" content="0; url=test.html">
-            <style>
-                body {
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                    max-width: 800px;
-                    margin: 0 auto;
-                    padding: 20px;
-                    background-color: #f5f5f5;
-                    text-align: center;
-                }
-                .card {
-                    background: white;
-                    padding: 20px;
-                    margin: 20px 0;
-                    border-radius: 8px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                }
-                .view-btn {
-                    display: inline-block;
-                    padding: 15px 30px;
-                    background: #007acc;
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 5px;
-                    margin: 5px;
-                    font-size: 16px;
-                }
-                .view-btn:hover {
-                    background: #005999;
-                }
-                .experimental {
-                    background: #ff9500;
-                    color: white;
-                    padding: 2px 6px;
-                    border-radius: 3px;
-                    font-size: 11px;
-                    font-weight: bold;
-                    margin-left: 5px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="card">
-                <h1>Typst Document: test.typ</h1>
-                <p>Redirecting to the HTML version...</p>
-                <p>If you're not redirected automatically, click below:</p>
-                <a href="test.html" class="view-btn">🌐 View Document <span class="experimental">EXPERIMENTAL</span></a>
-                
-                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; font-size: 14px; color: #666;">
-                    <p>This document was compiled from Typst source code using GitHub Actions and native Typst HTML export.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        EOF
+        # Make build script executable and run it for production
+        chmod +x build.sh
+        ./build.sh production
         
     - name: Prepare deployment directory
       run: |
-        # Create a clean deployment directory
-        mkdir -p dist
-        
-        # Copy only the files we want to deploy
-        cp test.html dist/
-        cp index.html dist/
-        cp glacier.jpg dist/
-        
         # Clean up build artifacts to avoid embedded git repository issues
         rm -rf typst-source
           

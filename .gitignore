@@ -1,0 +1,22 @@
+# Build output
+dist/
+*.pdf
+*.svg
+
+# Development
+node_modules/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp 
