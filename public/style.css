@@ -555,19 +555,24 @@ ul.tags a:hover {
 section:not([aria-label="CV"]) table, .blog-post table {
   border-collapse: collapse;
   margin: 1rem auto;
-  table-layout: auto;
-  width: 95%;
+  table-layout: fixed;
+  width: auto;
+  max-width: 100%;
+  display: table;
   overflow-x: auto;
-  display: block;
 }
 
 section:not([aria-label="CV"]) table thead,
 section:not([aria-label="CV"]) table tbody,
 .blog-post table thead,
 .blog-post table tbody {
-  display: table;
-  width: 95%;
-  table-layout: auto;
+  display: table-header-group;
+  width: 100%;
+}
+
+section:not([aria-label="CV"]) table tbody,
+.blog-post table tbody {
+  display: table-row-group;
 }
 
 section:not([aria-label="CV"]) table tr, .blog-post table tr {
@@ -588,20 +593,33 @@ section:not([aria-label="CV"]) td,
   text-align: left;
   padding: 8px 12px;
   border-bottom: 1px solid #e5e5e5;
+  border-right: 1px solid #e5e5e5;
   min-width: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
+  width: auto;
 }
+
+
 
 section:not([aria-label="CV"]) th, .blog-post th {
   color: #444;
   background-color: #f8f8f8;
+  font-weight: 600;
 }
 
 section:not([aria-label="CV"]) table tr:nth-child(2n),
 .blog-post table tr:nth-child(2n) {
   background-color: #fdfdfd;
+}
+
+/* Remove right border from last cell in each row */
+section:not([aria-label="CV"]) th:last-child,
+section:not([aria-label="CV"]) td:last-child,
+.blog-post th:last-child,
+.blog-post td:last-child {
+  border-right: none;
 }
 
 dt {
