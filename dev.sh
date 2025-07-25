@@ -17,7 +17,7 @@ echo ""
 
 # Build the project using Python build script
 echo "🔨 Building homepage with integrated Typst content..."
-python3 build.py local
+python3 build.py
 
 echo ""
 echo "🌐 Starting local development server..."
